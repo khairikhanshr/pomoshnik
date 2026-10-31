@@ -1,0 +1,271 @@
+/* Overlay HUD. The window is transparent: only the panel paints. */
+html,
+body.overlay-body,
+body.overlay-body #root {
+  /* color-scheme dark would paint an opaque canvas behind a transparent window. */
+  color-scheme: normal;
+  background: transparent !important;
+  height: 100%;
+  overflow: hidden;
+}
+
+.ov-stage {
+  height: 100%;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.ov-stage--bottom {
+  justify-content: flex-end;
+}
+
+.ov-panel {
+  --ov-accent: var(--accent);
+  position: relative;
+  width: 100%;
+  min-height: 100px;
+  max-height: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 14px 14px 12px;
+  border-radius: 18px;
+  background:
+    radial-gradient(120% 140% at 0% 0%, rgba(58, 216, 255, 0.14), transparent 55%),
+    linear-gradient(180deg, rgba(10, 20, 30, 0.96), rgba(5, 9, 15, 0.96));
+  border: 1px solid rgba(58, 216, 255, 0.24);
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 0 26px rgba(58, 216, 255, 0.12);
+  cursor: pointer;
+  overflow: hidden;
+  animation: ov-enter 0.42s var(--ease) both;
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.ov-panel::before {
+  /* scanlines */
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(158, 236, 255, 0.025) 0 1px, transparent 1px 3px);
+  border-radius: inherit;
+}
+
+.ov-panel:hover {
+  border-color: rgba(58, 216, 255, 0.42);
+}
+
+.ov-panel:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+  box-shadow: none;
+  border-radius: 18px;
+}
+
+.ov-panel--error {
+  --ov-accent: var(--danger);
+  border-color: rgba(255, 92, 122, 0.4);
+}
+
+.ov-panel--acting {
+  --ov-accent: #ffcd76;
+}
+
+.ov-panel--idle {
+  border-color: rgba(58, 216, 255, 0.16);
+}
+
+.ov-corner {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  pointer-events: none;
+  border-color: var(--ov-accent);
+  opacity: 0.7;
+}
+
+.ov-corner--tl {
+  top: 7px;
+  left: 7px;
+  border-top: 1.5px solid;
+  border-left: 1.5px solid;
+  border-top-left-radius: 8px;
+}
+
+.ov-corner--br {
+  right: 7px;
+  bottom: 7px;
+  border-right: 1.5px solid;
+  border-bottom: 1.5px solid;
+  border-bottom-right-radius: 8px;
+}
+
+.ov-head {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+}
+
+.ov-orb {
+  flex: none;
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  filter: drop-shadow(0 0 10px rgba(58, 216, 255, 0.35));
+}
+
+.ov-meta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ov-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ov-accent);
+  text-shadow: 0 0 12px rgba(58, 216, 255, 0.45);
+  min-width: 0;
+}
+
+.ov-status-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ov-status-dot {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ov-accent);
+  box-shadow: 0 0 8px var(--ov-accent);
+  animation: ov-blink 1.4s ease-in-out infinite;
+}
+
+.ov-panel--idle .ov-status-dot {
+  animation: none;
+  opacity: 0.6;
+}
+
+.ov-transcript {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ov-transcript--muted {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  color: var(--text-4);
+}
+
+.ov-close {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--text-3);
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.ov-close:hover {
+  background: rgba(58, 216, 255, 0.12);
+  color: var(--text);
+}
+
+.ov-reply {
+  position: relative;
+  max-height: calc(1.5em * 6);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--text-2);
+  padding: 10px 2px 0 4px;
+  border-top: 1px solid rgba(58, 216, 255, 0.12);
+}
+
+.ov-reply p {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.ov-reply--fade {
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 2.4em);
+  mask-image: linear-gradient(180deg, transparent 0, #000 2.4em);
+}
+
+.ov-reply--error {
+  color: #ffc2cd;
+}
+
+@keyframes ov-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.ov-stage--bottom .ov-panel {
+  animation-name: ov-enter-up;
+}
+
+@keyframes ov-enter-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes ov-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.35;
+  }
+}

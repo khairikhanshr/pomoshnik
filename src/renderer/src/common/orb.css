@@ -1,0 +1,224 @@
+/* Arc-reactor orb. Phase drives speeds/colors; --lv (0..1) is the live mic / speech level. */
+.orb {
+  --orb-accent: #3ad8ff;
+  --orb-arc: #9beeff;
+  --orb-deep: #0a5f80;
+  --orb-dark: #04101a;
+  --halo: 0.3;
+  --lv: 0;
+  position: relative;
+  display: inline-block;
+  flex: none;
+  line-height: 0;
+}
+
+.orb svg {
+  display: block;
+  overflow: visible;
+}
+
+.o-spin {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.o-halo {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: calc(var(--halo) + var(--lv) * (1 - var(--halo)));
+  transform: scale(calc(0.9 + var(--lv) * 0.16));
+  transition: opacity 0.4s var(--ease, ease);
+}
+
+.o-thin {
+  fill: none;
+  stroke: var(--orb-accent);
+  stroke-opacity: 0.3;
+  stroke-width: 0.8;
+}
+
+.o-tickring {
+  fill: none;
+  stroke: var(--orb-accent);
+  stroke-opacity: 0.42;
+}
+
+.o-arc {
+  fill: none;
+  stroke: var(--orb-arc);
+  stroke-linecap: round;
+  transition: stroke 0.5s ease;
+}
+
+.o-coilbase {
+  fill: none;
+  stroke: var(--orb-dark);
+  stroke-width: 21;
+}
+
+.o-coil {
+  fill: none;
+  stroke-width: 16;
+}
+
+.o-coiltex {
+  fill: none;
+  stroke: var(--orb-dark);
+  stroke-opacity: 0.5;
+  stroke-width: 16;
+  stroke-dasharray: 0.9 2.6;
+}
+
+.o-core-glow {
+  fill: var(--orb-accent);
+  opacity: calc(0.5 + var(--lv) * 0.5);
+}
+
+.o-core-hot {
+  fill: #ffffff;
+  opacity: 0.94;
+}
+
+.o-core-lv {
+  transform: scale(calc(1 + var(--lv) * 0.24));
+}
+
+.orb--mini .o-tickring {
+  stroke-opacity: 0.5;
+}
+
+/* ---------- phases ---------- */
+
+.orb:not([data-phase='static']) .o-ticks {
+  animation: orb-spin var(--t-ticks, 90s) linear infinite;
+}
+
+.orb:not([data-phase='static']) .o-arcs {
+  animation: orb-spin var(--t-arcs, 28s) linear infinite;
+}
+
+.orb:not([data-phase='static']) .o-coils {
+  animation: orb-spin var(--t-coils, 140s) linear infinite reverse;
+}
+
+.orb:not([data-phase='static']) .o-inner {
+  animation: orb-spin var(--t-inner, 20s) linear infinite reverse;
+}
+
+.orb:not([data-phase='static']) .o-core {
+  animation: orb-breathe var(--t-breathe, 4.2s) ease-in-out infinite;
+}
+
+.orb[data-phase='idle'] {
+  --halo: 0.22;
+  --t-breathe: 4.6s;
+}
+
+.orb[data-phase='idle'] svg {
+  opacity: 0.86;
+}
+
+.orb[data-phase='wake'] {
+  --halo: 0.85;
+  --t-arcs: 5s;
+  --t-inner: 4s;
+  --t-breathe: 1.1s;
+}
+
+.orb[data-phase='wake'] .o-halo {
+  animation: orb-flash 0.7s ease-out 1;
+}
+
+.orb[data-phase='listening'] {
+  --halo: 0.55;
+  --t-arcs: 12s;
+  --t-inner: 9s;
+  --t-breathe: 1.6s;
+}
+
+.orb[data-phase='transcribing'] {
+  --halo: 0.45;
+  --t-ticks: 30s;
+  --t-arcs: 3.2s;
+  --t-inner: 2.6s;
+  --t-breathe: 2.2s;
+}
+
+.orb[data-phase='thinking'] {
+  --halo: 0.48;
+  --t-ticks: 16s;
+  --t-arcs: 1.9s;
+  --t-inner: 1.5s;
+  --t-coils: 10s;
+  --t-breathe: 2.4s;
+}
+
+.orb[data-phase='acting'] {
+  --orb-arc: #ffcd76;
+  --halo: 0.5;
+  --t-ticks: 14s;
+  --t-arcs: 1.6s;
+  --t-inner: 1.3s;
+  --t-coils: 7s;
+  --t-breathe: 2s;
+}
+
+.orb[data-phase='speaking'] {
+  --halo: 0.4;
+  --t-arcs: 9s;
+  --t-inner: 7s;
+  --t-breathe: 3.2s;
+}
+
+.orb[data-phase='error'] {
+  --orb-accent: #ff5c7a;
+  --orb-arc: #ffa2b3;
+  --orb-deep: #7d1830;
+  --halo: 0.4;
+  --t-arcs: 40s;
+  --t-inner: 30s;
+  --t-breathe: 2.8s;
+}
+
+@keyframes orb-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes orb-breathe {
+  0%,
+  100% {
+    transform: scale(0.94);
+    opacity: 0.86;
+  }
+
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes orb-flash {
+  0% {
+    transform: scale(0.7);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: var(--halo);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orb .o-spin,
+  .orb .o-halo {
+    animation: none !important;
+  }
+
+  .o-core-lv,
+  .o-halo {
+    transform: none;
+  }
+}
